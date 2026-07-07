@@ -20,3 +20,28 @@ class UserOut(BaseModel):
 class UserPageOut(BaseModel):
     total: int
     items: list[UserOut]
+
+class UserImportIn(BaseModel):
+    external_user_id: str | None = None
+    phone: str | None = None
+    name: str | None = None
+    source: str | None = None
+    tags: list[str] | None = None
+    purchase_status: str | None = None
+    operation_status: str | None = None
+
+class UserImportRequest(BaseModel):
+    source: str | None = None
+    users: list[UserImportIn]
+
+class UserImportError(BaseModel):
+    index: int
+    message: str
+
+class UserImportResult(BaseModel):
+    imported_count: int
+    errors: list[UserImportError] = []
+
+class UserIdentityGroupOut(BaseModel):
+    main_user: UserOut
+    records: list[UserOut]
