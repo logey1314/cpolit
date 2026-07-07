@@ -45,3 +45,6 @@ class UserImportResult(BaseModel):
 class UserIdentityGroupOut(BaseModel):
     main_user: UserOut
     records: list[UserOut]
+
+class UserTagUpdateResult(BaseModel):
+    updated_tags: list[str]

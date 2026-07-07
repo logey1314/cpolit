@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.result import Result
-from app.schemas.user import UserImportRequest, UserImportResult, UserPageOut, UserIdentityGroupOut
+from app.schemas.user import UserImportRequest, UserImportResult, UserPageOut, UserIdentityGroupOut, UserTagUpdateResult
+from app.services.tag_service import standardize_user_tags
 from app.services.user_service import get_users, import_mock_users, get_user_identity_group
 
 router = APIRouter()
@@ -55,3 +56,18 @@ def get_user_identities(
         raise HTTPException(status_code=404, detail="用户不存在")
 
     return Result[UserIdentityGroupOut].success(data)
+
+@router.put("/users/{user_id}/tags", response_model=Result[UserTagUpdateResult])
+def update_user_tags(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    data = standardize_user_tags(
+        db=db,
+        user_id=user_id
+    )
+
+    if not data:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    return Result[UserTagUpdateResult].success(data)

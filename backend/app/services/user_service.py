@@ -136,3 +136,4 @@ def get_user_identity_group(db: Session, user_id: int):
         "main_user": main_user,
         "records": records
     }
+
