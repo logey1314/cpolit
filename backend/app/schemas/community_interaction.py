@@ -20,4 +20,9 @@ class CommunityInteractionOut(BaseModel):
 class NoiseFilterResult(BaseModel):
     valid_count: int
     noise_count: int
-    valid_messages: list[CommunityInteractionOut]
+
+class IntentRecognizeResult(BaseModel):
+    message_id: int
+    intent_label: str
+    sentiment: str
+    keywords: list[str]
