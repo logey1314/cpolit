@@ -26,3 +26,10 @@ class IntentRecognizeResult(BaseModel):
     intent_label: str
     sentiment: str
     keywords: list[str]
+
+class SilenceRiskResult(BaseModel):
+    user_id: int
+    silent_days: int | None = None
+    silence_label: str
+    risk_level: str
+    risk_reason: str | None = None
