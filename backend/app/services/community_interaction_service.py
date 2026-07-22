@@ -1,8 +1,10 @@
 import re
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
 from app.models.community_interaction import CommunityInteraction
+from app.models.private_user import PrivateUser
 from app.schemas.community_interaction import NoiseFilterResult
 
 
@@ -110,3 +112,58 @@ def filter_noise_interactions(
         valid_count=valid_count,
         noise_count=noise_count
     )
+
+
+def list_interaction_messages(
+    db: Session,
+    community_id: str | None = None,
+    days: int = 7,
+    page: int = 1,
+    page_size: int = 20,
+):
+    query = db.query(CommunityInteraction)
+
+    if days and days > 0:
+        since_time = datetime.now() - timedelta(days=days)
+        query = query.filter(
+            CommunityInteraction.interaction_time >= since_time
+        )
+
+    if community_id:
+        query = query.filter(
+            CommunityInteraction.community_id == community_id
+        )
+
+    total = query.count()
+    items = query.order_by(
+        CommunityInteraction.interaction_time.desc()
+    ).offset(
+        (page - 1) * page_size
+    ).limit(
+        page_size
+    ).all()
+
+    user_ids = list({item.user_id for item in items})
+    users = db.query(PrivateUser).filter(
+        PrivateUser.id.in_(user_ids)
+    ).all() if user_ids else []
+    user_name_map = {user.id: user.name for user in users}
+
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": item.id,
+                "community_id": item.community_id,
+                "user_id": item.user_id,
+                "user_name": user_name_map.get(item.user_id),
+                "message_content": item.message_content,
+                "message_type": item.message_type,
+                "keywords": item.keywords or [],
+                "intent_label": item.intent_label,
+                "sentiment": item.sentiment,
+                "interaction_time": item.interaction_time,
+            }
+            for item in items
+        ],
+    }

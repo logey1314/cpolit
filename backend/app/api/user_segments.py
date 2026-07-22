@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.schemas.result import Result
 from app.schemas.user_segment import UserSegmentAdjustRequest, UserSegmentOut
 from app.services.segment_service import (
+    get_segment_distribution,
     get_user_segment,
     judge_user_segment,
     manual_adjust_user_segment,
@@ -29,11 +30,15 @@ def judge_segment(
     return Result[UserSegmentOut].success(data)
 
 
-@router.get("/user-segments", response_model=Result[UserSegmentOut])
+@router.get("/user-segments", response_model=Result)
 def query_segment(
-    user_id: int,
+    user_id: int | None = None,
     db: Session = Depends(get_db)
 ):
+    if user_id is None:
+        data = get_segment_distribution(db=db)
+        return Result.success(data)
+
     data = get_user_segment(
         db=db,
         user_id=user_id

@@ -361,3 +361,25 @@ def manual_adjust_user_segment(
     cache_segment(segment)
 
     return segment_to_dict(segment)
+
+
+def get_segment_distribution(db: Session):
+    rows = db.query(
+        UserSegment.segment_type,
+        UserSegment.id
+    ).all()
+
+    counter = {}
+    for segment_type, _ in rows:
+        counter[segment_type] = counter.get(segment_type, 0) + 1
+
+    return {
+        "total": len(rows),
+        "items": [
+            {
+                "segment_type": segment_type,
+                "count": count,
+            }
+            for segment_type, count in counter.items()
+        ],
+    }

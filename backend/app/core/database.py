@@ -1,8 +1,17 @@
+import os
+
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 
-DATABASE_URL = "mysql+pymysql://root:123456@vip.bj.frp.one:46403/private_ops_copilot"
+load_dotenv()
+
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "mysql+pymysql://root:123456@202.189.8.161:46580/private_ops_copilot"
+)
 
 engine = create_engine(
     DATABASE_URL,

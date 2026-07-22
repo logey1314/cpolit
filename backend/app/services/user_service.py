@@ -3,12 +3,15 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.models.private_user import PrivateUser
+from app.models.user_segment import UserSegment
 from app.schemas.user import UserImportIn, UserImportResult, UserPageOut
 
 
 def get_users(
     db: Session,
     source: str | None = None,
+    keyword: str | None = None,
+    segment_type: str | None = None,
     skip: int = 0,
     limit: int = 10
 ):
@@ -17,8 +20,19 @@ def get_users(
     if source:
         query = query.filter(PrivateUser.source == source)
 
+    if keyword:
+        query = query.filter(PrivateUser.name.like(f"%{keyword}%"))
+
+    if segment_type:
+        query = query.join(
+            UserSegment,
+            UserSegment.user_id == PrivateUser.id
+        ).filter(
+            UserSegment.segment_type == segment_type
+        )
+
     total = query.count()
-    items = query.offset(skip).limit(limit).all()
+    items = query.order_by(PrivateUser.id.desc()).offset(skip).limit(limit).all()
 
     return UserPageOut(
         total=total,

@@ -13,6 +13,8 @@ router = APIRouter()
 @router.get("/users", response_model=Result[UserPageOut])
 def list_users(
     source: str = None,
+    keyword: str = None,
+    segment_type: str = None,
     page: int = 1,
     page_size: int = 10,
     db: Session = Depends(get_db)
@@ -22,6 +24,8 @@ def list_users(
     data = get_users(
         db=db,
         source=source,
+        keyword=keyword,
+        segment_type=segment_type,
         skip=skip,
         limit=page_size
     )

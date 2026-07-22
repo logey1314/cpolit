@@ -19,3 +19,13 @@ class UserSegmentOut(BaseModel):
 class UserSegmentAdjustRequest(BaseModel):
     segment_type: str
     reason: str
+
+
+class UserSegmentDistributionItem(BaseModel):
+    segment_type: str
+    count: int
+
+
+class UserSegmentDistributionOut(BaseModel):
+    total: int
+    items: list[UserSegmentDistributionItem]
